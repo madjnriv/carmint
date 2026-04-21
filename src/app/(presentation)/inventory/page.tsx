@@ -1,4 +1,5 @@
 import ClassifiedList from "@/components/inventory/classified-list";
+import { Sidebar } from "@/components/inventory/sidebar";
 import { PaginationBtns } from "@/components/shared/pagination-btns";
 import { CLASSIFIEDS_PER_PAGE } from "@/config/constants";
 import { routes } from "@/config/route";
@@ -40,8 +41,8 @@ export default async function InventoryPage(props: PageProps) {
   console.log(favourites);
 
   return (
-    <div className="">
-      {/* <Sidebar/> */}
+    <div className="flex">
+      <Sidebar minMaxValues={null} searchParams={searchParams} />
 
       <div className="flex-1 p-4 bg-primary-foreground">
         <div className="flex space-y-2 flex-col items-center justify-center pb-4 -mt-1">
