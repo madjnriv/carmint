@@ -8,6 +8,8 @@ import { env } from "process";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
+import { SearchInput } from "../shared/search-input";
+import { TaxonomyFilters } from "./taxonomy-filters";
 
 interface SidebarProps extends AwaitedPageProps {
   minMaxValues: any;
@@ -75,6 +77,17 @@ export const Sidebar = ({ minMaxValues, searchParams }: SidebarProps) => {
             Clear all {filterCount ? `(${filterCount})` : null}
           </Button>
         </div>
+
+        <div className="mt-2" />
+      </div>
+      <div className="p-4">
+        <SearchInput
+          placeholder="search classifieds..."
+          className="w-full px-3 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-ring"
+        />
+      </div>
+      <div className="p-4 space-y-2">
+        <TaxonomyFilters />
       </div>
     </div>
   );
