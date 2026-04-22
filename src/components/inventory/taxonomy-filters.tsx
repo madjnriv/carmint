@@ -1,8 +1,10 @@
 "use client";
 
 import { AwaitedPageProps } from "@/config/types";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { Select } from "../ui/select";
+import { endpoints } from "@/config/endpoints";
+import { api } from "@/lib/api-client";
 
 interface TaxonomyFiltersProps extends AwaitedPageProps {
   handleChange: (e: ChangeEvent<HTMLSelectElement>) => void;
@@ -13,7 +15,7 @@ type FilterOptions<LType, VType> = Array<{
   value: VType;
 }>;
 export const TaxonomyFilters = (props: TaxonomyFiltersProps) => {
-  const { searchParams, ...rest } = props;
+  const { searchParams, handleChange } = props;
 
   const [makes, setMakes] = useState<FilterOptions<string, string>>([]);
   const [models, setModels] = useState<FilterOptions<string, string>>([]);
@@ -21,30 +23,54 @@ export const TaxonomyFilters = (props: TaxonomyFiltersProps) => {
     FilterOptions<string, string>
   >([]);
 
+  useEffect(() => {
+    (async function fetchMakeOptions() {
+      const params = new URLSearchParams();
+      for (const [key, value] of Object.entries(
+        searchParams as Record<string, string>,
+      )) {
+        if (value) params.set(key, value as string);
+      }
+
+      const url = new URL(endpoints.taxonomy, window.location.href);
+
+      url.search = params.toString();
+
+      const data = await api.get<{
+        makes: FilterOptions<string, string>;
+        models: FilterOptions<string, string>;
+        modelVariants: FilterOptions<string, string>;
+      }>(url.toString());
+
+      setMakes(data.makes);
+      setModels(data.models);
+      setModelVariants(data.modelVariants);
+    })();
+  }, [searchParams]);
   return (
     <div>
       <Select
-        label="model"
+        label="Make"
         name="make"
         value={searchParams?.make as string}
-        options={[]}
-        onchange={() => null}
+        options={makes}
+        onchange={handleChange}
       />
       <Select
         label="Model"
         name="model"
         value={searchParams?.model as string}
-        options={[]}
-        onchange={() => null}
-        disabled={false}
+        options={models}
+        onchange={handleChange}
+        disabled={!models.length}
       />
       <Select
         label="Model Variant"
         name="modelVariant"
         value={searchParams?.modelVariant as string}
-        options={[]}
-        onchange={() => null}
-        disabled={false}
+        options={modelVariants}
+        onchange={handleChange}
+        disabled={!modelVariants.length}
       />
     </div>
   );

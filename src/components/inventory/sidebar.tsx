@@ -4,12 +4,12 @@ import { routes } from "@/config/route";
 import { AwaitedPageProps } from "@/config/types";
 import { useRouter } from "next/navigation";
 import { parseAsString, useQueryStates } from "nuqs";
-import { env } from "process";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { SearchInput } from "../shared/search-input";
 import { TaxonomyFilters } from "./taxonomy-filters";
+import { env } from "@/env";
 
 interface SidebarProps extends AwaitedPageProps {
   minMaxValues: any;
@@ -54,10 +54,30 @@ export const Sidebar = ({ minMaxValues, searchParams }: SidebarProps) => {
   }, [searchParams]);
 
   const clearFilters = () => {
-    const url = new URL(routes.inventory, env.NEXT_PUBLIC_APP);
+    const url = new URL(routes.inventory, env.NEXT_PUBLIC_APP_URL);
     window.location.replace(url.toString());
     setFilterCount(0);
   };
+
+  const handleChange = async (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const { name, value } = e.target;
+
+    setQueryStates({
+      [name]: value || null,
+    });
+
+    if (name === "make") {
+      setQueryStates({
+        model: null,
+        modelVariant: null,
+      });
+    }
+
+    router.refresh();
+  };
+
   return (
     <div className="py-4 w-85 border-r border-muted block">
       <div>
@@ -87,7 +107,10 @@ export const Sidebar = ({ minMaxValues, searchParams }: SidebarProps) => {
         />
       </div>
       <div className="p-4 space-y-2">
-        <TaxonomyFilters />
+        <TaxonomyFilters
+          searchParams={searchParams}
+          handleChange={handleChange}
+        />
       </div>
     </div>
   );
